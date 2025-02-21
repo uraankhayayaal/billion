@@ -1,0 +1,31 @@
+services:
+
+  billion-app:
+    build: ./
+    container_name: billion-app
+    restart: always
+    volumes:
+      - ./:/app
+    environment:
+      GITHUB_API_TOKEN: ${GITHUB_API_TOKEN}
+    networks:
+      - billion-net
+
+  billion-redis:
+    image: redis:7.4.2-alpine
+    container_name: billion-cache
+    restart: always
+    command: >
+      redis-server
+      --requirepass ${REDIS_PASSWORD}
+      --save ""
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_USER: ${REDIS_USERNAME}
+      REDIS_USER_PASSWORD: ${REDIS_PASSWORD}
+    networks:
+      - billion-net
+
+networks:
+  billion-net:
+    driver: 'bridge'

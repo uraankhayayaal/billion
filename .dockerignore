@@ -1,0 +1,8 @@
+.gitlab-ci.yml
+Dockerfile
+compose.yaml
+.DS_Store
+.dockerignore
+.git
+vendor
+.vscode
