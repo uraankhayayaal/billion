@@ -22,13 +22,15 @@ RUN curl -sS https://getcomposer.org/installer | php -- --filename=composer --in
 ENV COMPOSER_CACHE_DIR=/tmp/.composer/cache
 
 FROM build as dev
-CMD ["php", "artisan", "octane:start", "--host=0.0.0.0"]
+RUN apk add --no-cache npm \
+    && npm install -g --save-dev chokidar
+CMD ["php", "artisan", "octane:start", "--host=0.0.0.0", "--watch"]
 
 FROM build as prod
 ADD . .
 RUN chown -Rf www-data:www-data /app
 USER www-data
-RUN --mount=type=cache,target=/tmp/.composer/cache,gid=82,uid=82 composer install -o -n --no-progress
+RUN --mount=type=cache,target=/tmp/.composer/cache,gid=82,uid=82 composer install -o -n --no-progress --no-dev
 RUN php artisan octane:install \
     && php artisan key:generate \
     && php artisan config:cache

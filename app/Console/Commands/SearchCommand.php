@@ -8,7 +8,7 @@ use App\Jobs\SearchWordJob;
 use Illuminate\Console\Command;
 
 /**
- * docker compose exec -it apigetway-app php artisan queue:listen --timeout=120 --memory=192
+ * docker compose exec -it billion-app php artisan queue:listen --timeout=120 --memory=192
  */
 class SearchCommand extends Command
 {
