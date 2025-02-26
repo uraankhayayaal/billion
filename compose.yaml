@@ -15,7 +15,9 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD}
 
   billion-app:
-    build: ./
+    build:
+      context: ./
+      target: dev
     container_name: billion-app
     restart: always
     volumes:
