@@ -1,4 +1,18 @@
 services:
+  billion-db:
+    image: mysql:8.0
+    container_name: billion-db
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - billion-net
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
 
   billion-app:
     build: ./
@@ -6,6 +20,8 @@ services:
     restart: always
     volumes:
       - ./:/app
+    ports:
+      - 8000:8000
     environment:
       GITHUB_API_TOKEN: ${GITHUB_API_TOKEN}
     networks:
@@ -29,3 +45,6 @@ services:
 networks:
   billion-net:
     driver: 'bridge'
+
+volumes:
+  db-data:

@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 
 class WriterCommand extends Command
 {
-    public const COUNT = 1000000000;
+    public const COUNT = 10000000;
 
     public const BATCH_SIZE = 1000000;
 
@@ -122,7 +122,7 @@ class WriterCommand extends Command
         $lines = [];
 
         for ($i = 0; $i < self::COUNT; $i++) {
-            $lines[] = "$i";
+            $lines[] = "" . rand(0, self::BATCH_SIZE);
 
             if ((($i + 1) % self::BATCH_SIZE) === 0) {
                 fwrite($file, implode("\n", $lines) . "\n");

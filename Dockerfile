@@ -1,6 +1,7 @@
-FROM php:8.2-fpm-alpine as build
+FROM php:8.4-cli-alpine as build
+
 RUN apk update && \
-    apk add --no-cache bash build-base gcc autoconf libmcrypt-dev \
+    apk add --no-cache bash build-base gcc autoconf libmcrypt-dev brotli-dev \
     g++ make openssl-dev \
     php-openssl \
     php-bcmath \
@@ -9,26 +10,29 @@ RUN apk update && \
     php-json \
     php-xml \
     php-zip \
-    php-mbstring
-RUN pecl install redis \
-    && docker-php-ext-enable redis
-COPY ./php.ini /usr/local/etc/php/conf.d/base.ini
-COPY ./php-fpm.ini /usr/local/etc/php-fpm.d/www.conf
-WORKDIR /app
+    php-mbstring \
+    php-brotli \
+    php-pcntl \
+    && pecl install redis swoole \
+    && docker-php-ext-enable redis swoole
 
-FROM build as compose
+RUN docker-php-ext-configure pcntl --enable-pcntl \
+    && docker-php-ext-install pcntl pdo pdo_mysql
+
+COPY ./php.ini /usr/local/etc/php/php.ini
+
 RUN curl -sS https://getcomposer.org/installer | php -- --filename=composer --install-dir=/usr/local/bin
-RUN apk add --no-cache git
-RUN git config --global url."https://{GITHUB_API_TOKEN}:@github.com/".insteadOf "https://github.com/"
-COPY ./composer.json /app/composer.json
-COPY ./composer.lock /app/composer.lock
 
-FROM compose as dev_deps
-RUN apk add --no-cache linux-headers \
-    && pecl install xdebug-3.3.2 \
-    && docker-php-ext-enable xdebug
-COPY ./xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-RUN composer install
+WORKDIR /app
+ENV COMPOSER_CACHE_DIR=/tmp/.composer/cache
+ADD . .
 
-FROM dev_deps
-CMD php-fpm
+RUN chown -Rf www-data:www-data /app
+USER www-data
+RUN --mount=type=cache,target=/tmp/.composer/cache,gid=82,uid=82 composer install -o -n --no-progress
+RUN php artisan octane:install \
+    && php artisan key:generate \
+    && php artisan config:cache
+USER root
+
+CMD ["php", "artisan", "octane:start", "--host=0.0.0.0"]
