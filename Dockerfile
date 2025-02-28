@@ -24,7 +24,10 @@ ENV COMPOSER_CACHE_DIR=/tmp/.composer/cache
 FROM build as dev
 RUN apk add --no-cache npm \
     && npm install -g --save-dev chokidar
-CMD ["php", "artisan", "octane:start", "--host=0.0.0.0", "--watch"]
+# CMD ["composer", "update"]
+# CMD ["npm", "i"]
+# CMD ["php", "artisan", "octane:start", "--host=0.0.0.0", "--watch"]
+CMD ["sh", "/app/startup.sh"]
 
 FROM build as prod
 ADD . .
