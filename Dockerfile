@@ -1,6 +1,6 @@
 FROM php:8.4-cli-alpine as build
 RUN apk update && \
-    apk add --no-cache bash build-base gcc autoconf libmcrypt-dev brotli-dev \
+    apk add --no-cache bash build-base gcc autoconf libmcrypt-dev brotli-dev npm \
     g++ make openssl-dev \
     php-openssl \
     php-bcmath \
@@ -22,11 +22,10 @@ RUN curl -sS https://getcomposer.org/installer | php -- --filename=composer --in
 ENV COMPOSER_CACHE_DIR=/tmp/.composer/cache
 
 FROM build as dev
-RUN apk add --no-cache npm \
-    && npm install -g --save-dev chokidar
-# CMD ["composer", "update"]
-# CMD ["npm", "i"]
-# CMD ["php", "artisan", "octane:start", "--host=0.0.0.0", "--watch"]
+RUN apk add --no-cache linux-headers \
+    && pecl install xdebug-3.4.1 \
+    && docker-php-ext-enable xdebug
+COPY ./xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 CMD ["sh", "/app/startup.sh"]
 
 FROM build as prod
