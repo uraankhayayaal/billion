@@ -6,7 +6,7 @@
     "type": "project",
     "require": {
         "php": "^8.2",
-        "laravel/framework": "^12.0",
+        "laravel/framework": "^11.0|^12.0",
         "laravel/tinker": "^2.10.1",
         "laravel/octane": "^2.8",
         "doctrine/annotations": "^2.0",

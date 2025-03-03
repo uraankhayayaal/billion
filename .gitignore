@@ -22,3 +22,8 @@ yarn-error.log
 /.vscode
 /.zed
 billion.txt
+**/caddy
+frankenphp
+frankenphp-worker.php
+rr
+.rr.yaml
